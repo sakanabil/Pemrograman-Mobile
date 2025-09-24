@@ -403,7 +403,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ## 4. Selesaikan Codelabs: Your first Flutter app, lalu buatlah laporan praktikumnya dan push ke repository GitHub Anda!
 
-    Di Dart, fungsi dianggap sebagai objek. Artinya, fungsi bisa disimpan di dalam variabel, dilewatkan sebagai argumen ke fungsi lain, atau dikembalikan sebagai nilai dari fungsi lain. Ini memberikan fleksibilitas tinggi dalam menulis kode.
+## Output saka_app
+
+## Halaman Awal
+
+![Screenshot Tugas](img/output1tugas.png)
+
+## Button Like
+
+![Screenshot Tugas](img/output2tugas.png)
+
+## Halaman Favorite
+
+![Screenshot Tugas](img/output3tugas.png)
 
 ## 5. README.md berisi: capture hasil akhir tiap praktikum (side-by-side, bisa juga berupa file GIF agar terlihat proses perubahan ketika ada aksi dari pengguna) dengan menampilkan NIM dan Nama Anda sebagai ciri pekerjaan Anda.
 
