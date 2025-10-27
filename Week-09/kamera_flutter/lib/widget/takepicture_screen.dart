@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'diplaypicture_screen.dart';
+import 'package:kamera_flutter/widget/filter_carousel.dart';
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
 
-  const TakePictureScreen({super.key, required this.camera});
+  const TakePictureScreen({Key? key, required this.camera}) : super(key: key);
 
   @override
   State<TakePictureScreen> createState() => _TakePictureScreenState();
@@ -28,10 +28,32 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     super.dispose();
   }
 
+  Future<void> _takePictureAndOpenFilters() async {
+    try {
+      await _initializeControllerFuture;
+      final XFile image = await _controller.takePicture();
+
+      if (!mounted) return;
+
+      // Navigasi ke halaman filter
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhotoFilterCarousel(imagePath: image.path),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal mengambil foto: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture - 2341720108')),
+      appBar: AppBar(title: const Text('Take a Picture - 2341720108')),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -43,24 +65,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
-
-            final image = await _controller.takePicture();
-
-            if (!context.mounted) return;
-
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    DisplayPictureScreen(imagePath: image.path),
-              ),
-            );
-          } catch (e) {
-            print('Terjadi error saat mengambil foto: $e');
-          }
-        },
+        onPressed: _takePictureAndOpenFilters,
         child: const Icon(Icons.camera_alt),
       ),
     );
