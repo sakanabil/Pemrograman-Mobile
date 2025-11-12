@@ -36,7 +36,7 @@ class _NavigationFirstState extends State<NavigationFirst> {
 
     if (result != null && result is Color) {
       color = result;
-      setState(() {}); // WAJIB ADA!
+      setState(() {});
     }
   }
 }
