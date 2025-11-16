@@ -37,6 +37,8 @@ class _StreamHomePageState extends State<StreamHomePage> {
 
   late StreamTransformer transformer;
 
+  late StreamSubscription subscription;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +53,10 @@ class _StreamHomePageState extends State<StreamHomePage> {
             ElevatedButton(
               onPressed: () => addRandomNumber(),
               child: Text('New Random Number Saka'),
+            ),
+            ElevatedButton(
+              onPressed: () => stopStream(),
+              child: const Text('Stop Subscription Saka'),
             ),
           ],
         ),
@@ -89,32 +95,46 @@ class _StreamHomePageState extends State<StreamHomePage> {
       handleDone: (sink) => sink.close(),
     );
 
-    stream
-        .transform(transformer)
-        .listen((event) {
-          setState(() {
-            lastNumber = event;
-          });
-        })
-        .onError((error) {
-          setState(() {
-            lastNumber = -1;
-          });
+    subscription = stream.listen(
+      (event) {
+        setState(() {
+          lastNumber = event;
         });
+      },
+      onError: (error) {
+        setState(() {
+          lastNumber = -1;
+        });
+      },
+      onDone: () {
+        print('OnDone was called');
+      },
+    );
 
     super.initState();
+  }
+
+  void stopStream() {
+    numberStreamController.close();
   }
 
   @override
   void dispose() {
     numberStreamController.close();
+    subscription.cancel();
     super.dispose();
   }
 
   void addRandomNumber() {
     Random random = Random();
     int myNum = random.nextInt(10);
-    numberStream.addNumberToSink(myNum);
+    if (!numberStreamController.isClosed) {
+      numberStream.addNumberToSink(myNum);
+    } else {
+      setState(() {
+        lastNumber = -1;
+      });
+    }
   }
 
   // Soal 7
@@ -132,4 +152,9 @@ class _StreamHomePageState extends State<StreamHomePage> {
   // mendefinisikan cara kerja
   // Langkah 3: Menerapkan Transformer
   // Mengubah cara Anda "mendengarkan" stream.
+
+  // Soal 9
+  // Langkah 2: Langkah ini menginisialisasi stream dan memulai "langganan" (subscription) untuk mendengarkan data dari stream, di mana setiap data yang masuk akan langsung memperbarui tampilan UI.
+  // Langkah 6: Langkah ini memastikan langganan stream (subscription) dibatalkan secara bersih saat widget tidak lagi digunakan (dispose) untuk mencegah kebocoran memori.
+  // Langkah 8: Langkah ini berfungsi untuk menambahkan angka acak ke stream hanya jika stream masih terbuka, namun jika stream sudah ditutup, ia akan mengatur tampilan angka menjadi -1.
 }
