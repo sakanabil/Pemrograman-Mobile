@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'model/pizza.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,6 +30,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int appCounter = 0;
 
+  String documentsPath = '';
+  String tempPath = '';
+
   Future<void> readAndWritePreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     appCounter = prefs.getInt('appCounter saka') ?? 0;
@@ -49,30 +51,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future getPaths() async {
+    final docDir = await getApplicationDocumentsDirectory();
+    final tempDir = await getTemporaryDirectory();
+    setState(() {
+      documentsPath = docDir.path;
+      tempPath = tempDir.path;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    readAndWritePreference();
+    getPaths();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shared Preferences')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('You have opened the app $appCounter times.'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                deletePreference();
-              },
-              child: const Text('Reset counter'),
-            ),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Path Provider')),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text('Doc path: $documentsPath'),
+          Text('Temp path $tempPath'),
+        ],
       ),
     );
   }
