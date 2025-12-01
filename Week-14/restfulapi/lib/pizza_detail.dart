@@ -3,7 +3,15 @@ import 'model/pizza.dart';
 import 'httphelper.dart';
 
 class PizzaDetailScreen extends StatefulWidget {
-  const PizzaDetailScreen({super.key});
+  final Pizza pizza;
+  final bool isNew;
+
+  const PizzaDetailScreen({
+    super.key,
+    required this.pizza,
+    required this.isNew,
+  });
+
   @override
   State<PizzaDetailScreen> createState() => _PizzaDetailScreenState();
 }
@@ -17,6 +25,20 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
   final TextEditingController txtCategory = TextEditingController();
   final TextEditingController txtRating = TextEditingController();
   String operationResult = '';
+
+  @override
+  void initState() {
+    if (!widget.isNew) {
+      txtId.text = widget.pizza.id.toString();
+      txtName.text = widget.pizza.pizzaName ?? '';
+      txtDescription.text = widget.pizza.description ?? '';
+      txtPrice.text = widget.pizza.price.toString();
+      txtImageUrl.text = widget.pizza.imageUrl ?? '';
+      txtCategory.text = widget.pizza.category ?? '';
+      txtRating.text = widget.pizza.rating.toString();
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -89,7 +111,7 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
               ElevatedButton(
                 child: const Text('Send Post'),
                 onPressed: () {
-                  postPizza();
+                  savePizza();
                 },
               ),
             ],
@@ -99,7 +121,7 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
     );
   }
 
-  Future postPizza() async {
+  Future savePizza() async {
     HttpHelper helper = HttpHelper();
     Pizza pizza = Pizza();
     pizza.id = int.tryParse(txtId.text);
@@ -109,7 +131,9 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
     pizza.imageUrl = txtImageUrl.text;
     pizza.category = txtCategory.text;
     pizza.rating = double.tryParse(txtRating.text);
-    String result = await helper.postPizza(pizza);
+    final result = await (widget.isNew
+        ? helper.postPizza(pizza)
+        : helper.putPizza(pizza));
     setState(() {
       operationResult = result;
     });
