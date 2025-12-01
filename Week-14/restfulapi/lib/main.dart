@@ -57,24 +57,35 @@ class _MyHomePageState extends State<MyHomePage> {
           return ListView.builder(
             itemCount: (snapshot.data == null) ? 0 : snapshot.data!.length,
             itemBuilder: (BuildContext context, int position) {
-              return ListTile(
-                title: Text(snapshot.data![position].pizzaName ?? ''),
-                subtitle: Text(
-                  (snapshot.data![position].description ?? '') +
-                      ' - € ' +
-                      snapshot.data![position].price.toString(),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PizzaDetailScreen(
-                        pizza: snapshot.data![position],
-                        isNew: false,
-                      ),
-                    ),
+              return Dismissible(
+                key: Key(position.toString()),
+                onDismissed: (direction) {
+                  HttpHelper helper = HttpHelper();
+                  int pizzaId = snapshot.data![position].id ?? 0;
+                  snapshot.data!.removeWhere(
+                    (element) => element.id == pizzaId,
                   );
+                  helper.deletePizza(pizzaId);
                 },
+                child: ListTile(
+                  title: Text(snapshot.data![position].pizzaName ?? ''),
+                  subtitle: Text(
+                    (snapshot.data![position].description ?? '') +
+                        ' - € ' +
+                        snapshot.data![position].price.toString(),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PizzaDetailScreen(
+                          pizza: snapshot.data![position],
+                          isNew: false,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );
